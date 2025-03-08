@@ -76,17 +76,16 @@ exports.updateUser = async (req, res) => {
 exports.deletedUser = async (req, res) => {
   try {
     const userId = req.params.id;
-
     const user = await prisma.user.delete({
-      where: { id: userId },
+      where: { id: userId }
     });
 
-    res.status(200).json({ message: 'User deleted successfully' });
-  } catch (error) {
-    if (error.code === 'P2025') {
-      return res.status(400).json({ message: 'User does not exist' });
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
     }
-    res.status(400).json({ message: error.message });
+    res.status(200).json({ message: 'Usuário deletado com sucesso' });
+  } catch (error) {
+    res.status(400).json({ message: 'User does not exist' });
   }
 };
 
