@@ -10,9 +10,4 @@ Esta é uma API RESTful desenvolvida com Node.js, Express, MongoDB e JWT para au
 - **Prisma**: ORM para Node.js e TypeScript.
 - **JWT (JSON Web Tokens)**: Para autenticação e autorização.
 
-## Pré-requisitos
-- Node.js (v14 ou superior)
-- npm ou yarn
-- MongoDB (local ou Atlas)
-- Prisma CLI
 
