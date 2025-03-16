@@ -35,8 +35,8 @@ exports.createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const salt = await bcrypt.genSalt(10); // Gera um salt único para a senha.
-    const hashPassword = await bcrypt.hash(password, salt); // Gera o hash da senha usando o salt.
+    const salt = await bcrypt.genSalt(10); 
+    const hashPassword = await bcrypt.hash(password, salt); 
 
     const user = await prisma.user.create({
       data: {
@@ -47,7 +47,7 @@ exports.createUser = async (req, res) => {
     });
 
     const token = jwt.sign({ id: user.id }, jwt_secret, { expiresIn: "1h" });
-
+    console.log('token: ', token);
     res.status(201).json({ message: 'User created successfully', token, user });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -81,9 +81,10 @@ exports.deletedUser = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: 'Usuário não encontrado' });
+      return res.status(404).json({ message: ' User not found' });
     }
-    res.status(200).json({ message: 'Usuário deletado com sucesso' });
+
+    res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(400).json({ message: 'User does not exist' });
   }

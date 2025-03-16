@@ -13,7 +13,7 @@ app.use(routes)
 const mongoose = require('mongoose')
 mongoose.connect(process.env.DATABASE_URL)
 .then(() => {
-    console.log('Connected')
+    console.log('Connected to database')
     app.emit('Database')
 })
 .catch((e) => console.log(e))
