@@ -1,7 +1,7 @@
 # API RESTful com Node.js, Express, MongoDB e JWT
 
 ## Descrição
-Esta é uma API RESTful desenvolvida com Node.js, Express, MongoDB e JWT para autenticação. Ela fornece endpoints para gerenciar recursos específicos, como usuários, posts, etc.
+API RESTful com Node.js, Express, MongoDB e JWT.
 
 ## Tecnologias Utilizadas
 - **Node.js**: Ambiente de execução JavaScript.
