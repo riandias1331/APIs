@@ -9,19 +9,11 @@ app.use(express.json())
 const routes = require('./routes')
 app.use(routes)
 
-
-const mongoose = require('mongoose')
-mongoose.connect(process.env.DATABASE_URL)
-.then(() => {
-    console.log('Connected to database')
-    app.emit('Database')
-})
-.catch((e) => console.log(e))
-
+const connectDB = require('./src/config/database.js')
+connectDB(app, port)
 
 app.on('Database', () => {
     app.listen(port, () => {
-        console.log('Server is running')
+        console.log(`Server is running on port ${port}`)
     })
 })
-
