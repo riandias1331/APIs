@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const connectDB = (app, port) => {
+const connectDB = (app) => {
     mongoose.connect(process.env.DATABASE_URL)
         .then(() => {
             console.log('Connected to database')
