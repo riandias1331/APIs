@@ -10,7 +10,7 @@ const routes = require('./routes')
 app.use(routes)
 
 const connectDB = require('./src/config/database.js')
-connectDB(app, port)
+connectDB(app)
 
 app.on('Database', () => {
     app.listen(port, () => {
