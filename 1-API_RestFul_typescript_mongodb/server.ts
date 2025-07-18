@@ -3,6 +3,7 @@ import express, { Express } from "express"
 import mongoose from "mongoose"
 import routes from "./routes"
 import cors from "cors"
+import { connectDB } from './src/config/db';
 
 dotenv.config()
 const app: Express = express()
@@ -27,8 +28,21 @@ mongoose.connect(process.env.DATABASE_URL as string)
     })
 
 // Server
-app.on("DataBase", () => {
+// app.on("DataBase", () => {
+//     app.listen(port, () => {
+//         console.log(`Server is running in http://localhost:${port}`)
+//     })
+// })
+const startServer = async () => {
+  try {
+    await connectDB(); // Conecta ao MongoDB
+    console.log('Starting server...');
     app.listen(port, () => {
-        console.log(`Server is running in http://localhost:${port}`)
-    })
-})
+      console.log(`Server is running in http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', (error as Error).message);
+  }
+};
+
+startServer();
