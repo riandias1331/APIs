@@ -17,22 +17,7 @@ app.use(cors())
 // Routes
 app.use(routes)
 
-// Database
-mongoose.connect(process.env.DATABASE_URL as string)
-    .then(() => {
-        console.log('Database is Connect')
-        app.emit("DataBase")
-    })
-    .catch((error) => {
-        console.log(error)
-    })
-
-// Server
-// app.on("DataBase", () => {
-//     app.listen(port, () => {
-//         console.log(`Server is running in http://localhost:${port}`)
-//     })
-// })
+// Server And Database
 const startServer = async () => {
   try {
     await connectDB(); // Conecta ao MongoDB

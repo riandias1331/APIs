@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import User, { IUser } from '../models/userModel';
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
 // Listar todos os usuários
 export const getUsersAll = async (req: Request, res: Response) => {
@@ -31,8 +33,18 @@ export const createUser = async (req: Request, res: Response) => {
       if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
-    const user = await User.create({ name, email, password });
-    res.status(201).json(user);
+
+    // Criptografa a senha com bcrypt
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.create({ name, email, password: hashPassword });
+
+    // Gera o token JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+
+    console.log('token:', token, user);
+    res.status(201).json({ message: 'User created successfully', token, user });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
