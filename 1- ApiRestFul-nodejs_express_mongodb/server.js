@@ -4,6 +4,7 @@ const port = process.env.PORT
 const routes = require('./routes')
 const cors = require('cors')
 const connectDB = require('./src/config/database.js')
+const errHandler = require('./src/middleware/errorhandler.js')
 
 const app = express()
 app.use(cors({
@@ -19,6 +20,9 @@ app.use(express.json())
 
 // Routes
 app.use(routes)
+
+// Error Handler
+app.use(errHandler)
 
 // Database
 connectDB(app)
