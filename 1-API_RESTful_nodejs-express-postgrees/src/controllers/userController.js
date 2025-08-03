@@ -1,76 +1,199 @@
-import UserModel from '../models//userModels.js'
+import {
+    createUserService,
+    getAllUsersService,
+    getUserByIdService,
+    updateUserService,
+    deleteUserService,
+    deleteUserAllService
+} from '../models/userModels.js';
 
-const UserController = {
-  async createUser(req, res) {
-    try {
-      const usuario = await UserModel.create(req.body);
-      res.status(201).json(usuario);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+const handleResponse = (res, status, message, data = null) => {
+    res.status(status).json({
+        status,     
+        message,    
+        data        
+    });
+}
+
+export const createUser = async (req, res) => {
+    const { name, email } = req.body; 
+
+
+    if (!name || !email) {
+        return handleResponse(res, 400, 'Name and email are required');
     }
-  },
 
-  async getUsers(req, res) {
     try {
-      const usuarios = await UserModel.findAll();
-      res.json(usuarios);
+        const newUser = await createUserService(name, email);
+        handleResponse(res, 201, 'User created successfully', newUser);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        console.error('Error in createUser:', error);
+        handleResponse(res, 500, 'Error creating user');
     }
-  },
+}
 
-  async getUserId(req, res) {
+export const getAllUsers = async (req, res) => {
     try {
-      const usuario = await UserModel.findById(req.params.id);
-      if (!usuario) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-      }
-      res.json(usuario);
+        const users = await getAllUsersService();
+        handleResponse(res, 200, 'Users fetched successfully', users);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        console.error('Error in getAllUsers:', error);
+        handleResponse(res, 500, 'Error fetching users');
     }
-  },
+}
 
-  async updateUser(req, res) {
+export const getUserById = async (req, res) => {
+    const { id } = req.params; 
     try {
-      const usuario = await UserModel.update(req.params.id, req.body);
-      if (!usuario) {
-        return res.status(404).json({ error: 'Usuário não encontrado' });
-      }
-      res.json(usuario);
+        const user = await getUserByIdService(id);
+        if (!user) {
+            return handleResponse(res, 404, 'User not found');
+        }
+        handleResponse(res, 200, 'User fetched successfully', user);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        console.error('Error in getUserById:', error);
+        handleResponse(res, 500, 'Error fetching user');
     }
-  },
+}
 
-  async deleteUser(req, res) {
+export const updateUser = async (req, res) => {
+    const { id } = req.params; 
+    const { name, email } = req.body; 
     try {
-      await UserModel.delete(req.params.id);
-      res.status(204).json({ message: "user deleted" }).end();
+        const updatedUser = await updateUserService(id, name, email);
+        if (!updatedUser) {
+            return handleResponse(res, 404, 'User not found');
+        }
+        handleResponse(res, 200, 'User updated successfully', updatedUser);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        console.error('Error in updateUser:', error);
+        handleResponse(res, 500, 'Error updating user');
     }
-  },
+}
 
-  async deleteUserAll(req, res) {
+export const deleteUser = async (req, res) => {
+    const { id } = req.params; 
     try {
-    //   // Antes de deletar, cria backup
-    // await backupService.createBackup('users_pre_delete');
-
-      if (process.env.NODE_ENV === 'production') {
-        return res.status(403).json({ 
-          error: "This operation is not allowed in production" 
-        });
-      }
-      const result = await UserModel.deleteAll();
-      res.status(200).json({
-        message: `All users (${result.count}) were deleted successfully`,
-        deletedCount: result.count
-      });
+        const deletedUser = await deleteUserService(id);
+        if (!deletedUser) {
+            return handleResponse(res, 404, 'User not found');
+        }
+        handleResponse(res, 200, 'User deleted successfully', deletedUser);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        console.error('Error in deleteUser:', error);
+        handleResponse(res, 500, 'Error deleting user');
     }
-  }
+}
+
+export const deleteAll = async (req, res) => {
+    try {
+        const deleted = await deleteUserAllService();
+
+        if (deleted.count === 0) {
+            return handleResponse(res, 404, 'No users found to delete');
+        }
+
+        handleResponse(
+            res,
+            200,
+            `All users (${deleted.count}) were deleted successfully`,
+            { deletedCount: deleted.count, deletedUsers: deleted.users }
+        );
+    } catch (error) {
+        if (error.message === "Operation not allowed in production") {
+            return handleResponse(res, 403, error.message);
+        }
+
+        console.error('Error in deleteAll:', error);
+        handleResponse(res, 500, 'Error deleting all users');
+    }
 };
 
-export default UserController;
+
+// // Model
+// import {
+//     createUserService,
+//     getAllUsersService,
+//     getUserByIdService,
+//     updateUserService,
+//     deleteUserService 
+// } from '../models/userModel.js';
+
+// // Função utilitária para enviar respostas padronizadas
+// const handleResponse = (res, status, message, data = null) => {
+//     res.status(status).json({
+//         status,     
+//         message,    
+//         data        
+//     });
+// }
+
+// // Controller para criar um novo usuário
+// export const createUser = async(req, res) => {
+//     const { name, email } = req.body; 
+//     try {
+//         const newUser = await createUserService(name, email);
+//         handleResponse(res, 200, 'Users fetched successfully', newUser);
+//     } catch (error) {
+//         console.error(error);
+//         handleResponse(res, 500, 'Error creating user');
+//     }
+// }
+
+// // Controller para buscar todos os usuários
+// export const getAllUsers = async(req, res) => {
+//     try {
+//         const Users = await getAllUsersService();
+//         handleResponse(res, 200, 'Users fetched successfully', Users);
+//     }
+//     catch (error) {
+//         console.error(error);
+//         handleResponse(res, 500, 'Error fetching users');
+//     }
+// }
+
+// // Controller para buscar usuário pelo ID
+// export const getUserById = async(req, res) => {
+//     const { id } = req.params; 
+//     try {
+//         const user = await getUserByIdService(id);
+//         if (!user) {
+//             return handleResponse(res, 404, 'User not found');
+//         }
+//         handleResponse(res, 200, 'User fetched successfully', user);
+//     } catch (error) {
+//         console.error(error);
+//         handleResponse(res, 500, 'Error fetching user');
+//     }
+// }
+
+// // Controller para atualizar dados de um usuário
+// export const updateUser = async(req, res) => {
+//     const { id } = req.params; 
+//     const { name, email } = req.body; 
+//     try {
+//         const updatedUser = await updateUserService(id, name, email);
+//         if (!updatedUser) {
+//             return handleResponse(res, 404, 'User not found');
+//         }
+//         handleResponse(res, 200, 'User updated successfully', updatedUser);
+//     } catch (error) {
+//         console.error(error);
+//         handleResponse(res, 500, 'Error updating user');
+//     }
+// }
+
+// // Controller para excluir um usuário
+// export const deleteUser = async(req, res) => {
+//     const { id } = req.params; 
+//     try {
+//         const deletedUser = await deleteUserService(id);
+//         if (!deletedUser) {
+//             return handleResponse(res, 404, 'User not found');
+//         }
+//         handleResponse(res, 200, 'User deleted successfully', deletedUser);
+//     } catch (error) {
+//         console.error(error);
+//         handleResponse(res, 500, 'Error deleting user');
+//     }
+// }
