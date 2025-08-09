@@ -16,9 +16,6 @@ const handleResponse = (res, status, message, data = null) => {
     });
 }
 
-import express from 'express';
-const router = express.Router();
-
 
 export const createUser = async (req, res) => {
     try {
