@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import pool from "../config/db.js";
+import jwt from "jsonwebtoken";
+const jwt_secret = process.env.JWT_SECRET;
 
 export const getAllUsersService = async () => {
     try {
@@ -22,13 +24,19 @@ export const getUserByIdService = async (id) => {
 };
 
 export const createUserService = async (name, email, password) => {
-    try {
+  try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await pool.query(
             "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
             [name, email, hashedPassword]
         );
-        return result.rows[0];
+        // return result.rows[0];
+        const user = result.rows[0];
+
+        const token = jwt.sign({ id: user.id }, jwt_secret, { expiresIn: "1h" });
+
+        console.log('Token: ', token);
+        return { token, user: { id: user.id, name: user.name, email: user.email } };
     } catch (error) {
         console.error("Erro ao criar usuário:", error);
         throw error;
